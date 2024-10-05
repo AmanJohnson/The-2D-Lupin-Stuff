@@ -31,6 +31,9 @@ namespace Invector.vCharacterController
         public GenericInput jumpInput = new GenericInput("Space", "X", "X");
         public GenericInput rollInput = new GenericInput("Q", "B", "B");
 
+        public GenericInput customAnimationInput = new GenericInput("G", "JoystickButton", "MobileButton");
+
+
         protected bool _lockInput = false;
         [HideInInspector] public virtual bool lockInput { get { return _lockInput; } set { _lockInput = value; } }
 
@@ -42,6 +45,8 @@ namespace Invector.vCharacterController
         public GenericInput rotateCameraXInput = new GenericInput("Mouse X", "RightAnalogHorizontal", "Mouse X");
         public GenericInput rotateCameraYInput = new GenericInput("Mouse Y", "RightAnalogVertical", "Mouse Y");
         public GenericInput cameraZoomInput = new GenericInput("Mouse ScrollWheel", "", "");
+
+        public bool isSighPlaying = false;
 
         [vEditorToolbar("Events")]
         public UnityEvent OnLockCamera;
@@ -58,7 +63,8 @@ namespace Invector.vCharacterController
         [HideInInspector]
         public string customlookAtPoint;                    // generic string to change the CameraPoint of the Fixed Point Mode
         [HideInInspector]
-        public bool changeCameraState;                      // generic bool to change the CameraState
+        
+         public bool changeCameraState;                         // generic bool to change the CameraState
         [HideInInspector]
         public bool smoothCameraState;                      // generic bool to know if the state will change with or without lerp
         [HideInInspector]
@@ -241,7 +247,8 @@ namespace Invector.vCharacterController
             }
 
             InputHandle();                      // update input methods                        
-            UpdateHUD();                        // update hud graphics            
+            UpdateHUD();        
+                 
         }
 
         public virtual void OnAnimatorMoveEvent()
@@ -431,26 +438,30 @@ namespace Invector.vCharacterController
 
         #region Basic Locomotion Inputs
 
-        public virtual void InputHandle()
-        {
-            if (lockInput || cc.ragdolled)
-            {
-                return;
-            }
+protected virtual void InputHandle()
+{
+    if (lockInput || cc.ragdolled)
+    {
+        return;
+    }
 
-            MoveInput();
-            SprintInput();
-            CrouchInput();
-            StrafeInput();
-            JumpInput();
-            RollInput();
-        }
+    MoveInput();
+    SprintInput();
+    CrouchInput();
+    StrafeInput();
+    JumpInput();
+    RollInput();
+}
 
-        public virtual void MoveInput()
-        {
+
+
+
+
+
+
+        public virtual void MoveInput()   {
             if (!lockMoveInput)
             {
-                // gets input
                 var input = cc.input;
                 input.x = horizontalInput.GetAxisRaw();
                 input.z = verticalInput.GetAxisRaw();
@@ -464,6 +475,10 @@ namespace Invector.vCharacterController
 
             cc.ControlKeepDirection();
         }
+
+
+
+
 
         public virtual bool rotateToLockTargetConditions => tpCamera && tpCamera.lockTarget && cc.isStrafing && !cc.isRolling && !cc.isJumping && !cc.customAction;
         public virtual void ControlRotation()
@@ -588,7 +603,7 @@ namespace Invector.vCharacterController
                 tpCamera.Zoom(zoom);
             }
         }
-
+        
         public virtual void UpdateCameraStates()
         {
             // CAMERA STATE - you can change the CameraState here, the bool means if you want lerp of not, make sure to use the same CameraState String that you named on TPCameraListData
